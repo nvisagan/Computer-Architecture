@@ -2,33 +2,60 @@
 
 import sys
 
+LDI = 0b10000010
+PRN = 0b01000111
+HLT = 0b00000001
+
 class CPU:
     """Main CPU class."""
 
     def __init__(self):
         """Construct a new CPU."""
-        pass
+         
+        self.pc = 0 #Program Counter
+        self.reg = [0] * 8 #8 general purpose registers
+        self.ram = [0] * 256 #Hold 256 bytes of memory
 
-    def load(self):
+    def load(self, progname):
         """Load a program into memory."""
 
+        #progname = sys.argv[1]
+
+        # with open(progname) as f:
+        #     for line in f:
+        #         line = line.split("#")[0]
+        #         line = line.strip()
+        #           
+        #         if line == '':
+        #           continue
+        #        
+        #         val = int(line, 2)
+        #         #print(val)
+        #         memory[address] = val
+        #         addresss += 1
+
+        # sys.exit(0)
         address = 0
+        progname = sys.argv[1]
+        with open(progname) as f:
+            for line in f:
+                line = line.split("#")[0]
+                line = line.strip()
 
-        # For now, we've just hardcoded a program:
+                if line == "":
+                    continue
+                val = int(line, 2)
+                self.ram[address] = val
+                address +=1
 
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111, # PRN R0
-            0b00000000,
-            0b00000001, # HLT
-        ]
 
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
+
+
+    def ram_read(self, mar):
+        return self.ram[mar]
+
+    def ram_write(self, mdr, mar):
+        self.ram[mar] = mdr
 
 
     def alu(self, op, reg_a, reg_b):
@@ -39,13 +66,13 @@ class CPU:
         #elif op == "SUB": etc
         else:
             raise Exception("Unsupported ALU operation")
+        pass
 
     def trace(self):
         """
         Handy function to print out the CPU state. You might want to call this
         from run() if you need help debugging.
         """
-
         print(f"TRACE: %02X | %02X %02X %02X |" % (
             self.pc,
             #self.fl,
@@ -62,4 +89,27 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        while True:
+            #instruction = memory[pc]
+            opcode = self.ram[self.pc]
+            operand_a = self.ram_read(self.pc + 1)
+            operand_b = self.ram_read(self.pc + 2)
+
+            #Save_Reg
+            if opcode == LDI:
+                #Value = memory[pc+1]
+                #reg_num = memory[pc+2]
+                self.reg[operand_a] = operand_b
+                #3 Byte instruction
+                self.pc +=3
+            elif opcode == PRN:
+                #reg_num = memory[pc + 1]
+                #print (register[reg_num])
+                print(self.reg[operand_a])
+                #2 byte instruction 
+                self.pc +=2
+            elif opcode == HLT:
+                #BEEj, only exits if there is an error?
+                sys.exit(1)
+
+        
