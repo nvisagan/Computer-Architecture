@@ -5,6 +5,7 @@ import sys
 LDI = 0b10000010
 PRN = 0b01000111
 HLT = 0b00000001
+MUL = 0b10100010
 
 class CPU:
     """Main CPU class."""
@@ -35,6 +36,7 @@ class CPU:
         #         addresss += 1
 
         # sys.exit(0)
+
         address = 0
         progname = sys.argv[1]
         with open(progname) as f:
@@ -44,6 +46,7 @@ class CPU:
 
                 if line == "":
                     continue
+
                 val = int(line, 2)
                 self.ram[address] = val
                 address +=1
@@ -63,10 +66,11 @@ class CPU:
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-        #elif op == "SUB": etc
+        elif op == MUL:
+            self.reg[reg_a] *= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
-        pass
+        
 
     def trace(self):
         """
@@ -108,6 +112,9 @@ class CPU:
                 print(self.reg[operand_a])
                 #2 byte instruction 
                 self.pc +=2
+            elif opcode == MUL:
+                self.alu(opcode, operand_a, operand_b)
+                self.pc +=3
             elif opcode == HLT:
                 #BEEj, only exits if there is an error?
                 sys.exit(1)
