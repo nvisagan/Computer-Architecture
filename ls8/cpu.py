@@ -6,6 +6,10 @@ LDI = 0b10000010
 PRN = 0b01000111
 HLT = 0b00000001
 MUL = 0b10100010
+POP = 0b01000110
+PUSH = 0b01000101
+
+SP = 7
 
 class CPU:
     """Main CPU class."""
@@ -115,6 +119,17 @@ class CPU:
             elif opcode == MUL:
                 self.alu(opcode, operand_a, operand_b)
                 self.pc +=3
+            elif opcode == PUSH:
+                self.reg[SP] -= 1
+                reg = self.ram[self.pc + 1]
+                val = self.reg[reg]
+                self.ram[self.reg[SP]] = val
+                self.pc += 2
+            elif opcode == POP:
+                val = self.ram[self.reg[SP]]
+                reg = self.ram[self.pc + 1]
+                self.reg[SP] += 1
+                self.pc += 2                
             elif opcode == HLT:
                 #BEEj, only exits if there is an error?
                 sys.exit(1)
