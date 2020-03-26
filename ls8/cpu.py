@@ -11,6 +11,7 @@ PUSH = 0b01000101
 
 SP = 7
 
+
 class CPU:
     """Main CPU class."""
 
@@ -20,6 +21,7 @@ class CPU:
         self.pc = 0 #Program Counter
         self.reg = [0] * 8 #8 general purpose registers
         self.ram = [0] * 256 #Hold 256 bytes of memory
+         
 
     def load(self, progname):
         """Load a program into memory."""
@@ -128,6 +130,7 @@ class CPU:
             elif opcode == POP:
                 val = self.ram[self.reg[SP]]
                 reg = self.ram[self.pc + 1]
+                self.reg[reg] = val
                 self.reg[SP] += 1
                 self.pc += 2                
             elif opcode == HLT:
